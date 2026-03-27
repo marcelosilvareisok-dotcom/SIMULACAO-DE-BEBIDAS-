@@ -135,7 +135,7 @@ export default function App() {
                 if (permission === 'granted') {
                     setHasPermission(true);
                 } else {
-                    alert('Permission to access device orientation was denied.');
+                    alert('A permissão para acessar a orientação do dispositivo foi negada.');
                 }
             } catch (error) {
                 console.error(error);
@@ -307,24 +307,31 @@ export default function App() {
                     <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
                         className="flex flex-col items-center gap-6 text-center"
                     >
-                        <div className="w-32 h-32 bg-amber-500/10 rounded-full flex items-center justify-center mb-4">
+                        <motion.div 
+                            animate={{ y: [0, -15, 0], rotate: [0, -5, 5, 0] }}
+                            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                            className="w-32 h-32 bg-amber-500/10 rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(245,158,11,0.15)]"
+                        >
                             <Beer size={64} className="text-amber-500" />
-                        </div>
+                        </motion.div>
                         <h1 className="text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-amber-400 to-orange-600">
-                            iBeer Sim
+                            Cerveja Virtual
                         </h1>
                         <p className="text-zinc-400 max-w-sm text-lg mb-8">
-                            Tilt your phone to drink a virtual pint. <br/>
-                            <span className="text-sm opacity-70">(Requires device motion access)</span>
+                            Incline o celular para tomar uma gelada. <br/>
+                            <span className="text-sm opacity-70">(Requer acesso ao sensor de movimento)</span>
                         </p>
-                        <button 
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={requestAccess}
-                            className="px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-full text-2xl transition-all active:scale-95 shadow-[0_0_40px_rgba(245,158,11,0.4)]"
+                            className="px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-full text-2xl transition-all shadow-[0_0_40px_rgba(245,158,11,0.4)]"
                         >
-                            Pour a Pint
-                        </button>
+                            Desce uma Gelada!
+                        </motion.button>
                     </motion.div>
                 </div>
             ) : (
@@ -344,14 +351,14 @@ export default function App() {
                                 onClick={refill}
                                 className="pointer-events-auto px-8 py-4 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 font-bold rounded-full text-xl flex items-center gap-3 transition-all active:scale-95 shadow-2xl"
                             >
-                                <RefreshCcw size={24} /> Refill Glass
+                                <RefreshCcw size={24} /> Mais uma!
                             </button>
                         </motion.div>
                     )}
                     
                     {uiVolume > 0.95 && (
                         <div className="absolute top-12 left-0 right-0 text-center z-30 pointer-events-none opacity-50">
-                            <p className="text-white/70 font-medium tracking-widest uppercase text-sm">Tilt to drink</p>
+                            <p className="text-white/70 font-medium tracking-widest uppercase text-sm">Incline para beber</p>
                         </div>
                     )}
                 </>
