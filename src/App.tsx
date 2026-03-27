@@ -5,7 +5,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { Beer, RefreshCcw } from 'lucide-react';
+import { Beer, RefreshCcw, Share2 } from 'lucide-react';
 
 class Bubble {
     x: number;
@@ -167,7 +167,7 @@ export default function App() {
                 const y = e.clientY / window.innerHeight;
                 orientationRef.current = {
                     gamma: (x - 0.5) * 90,
-                    beta: 90 - y * 90
+                    beta: 90 - y * 130
                 };
             }
         };
@@ -177,7 +177,7 @@ export default function App() {
                 const y = e.touches[0].clientY / window.innerHeight;
                 orientationRef.current = {
                     gamma: (x - 0.5) * 90,
-                    beta: 90 - y * 90
+                    beta: 90 - y * 130
                 };
             }
         };
@@ -269,8 +269,9 @@ export default function App() {
             let pourRate = 0;
             if (isSpilling) pourRate += 0.003;
 
-            if (beta < 45 && beta > -90) {
-                pourRate += Math.max(0, (45 - beta) / 45) * 0.006;
+            // Only drink when the phone is tilted past horizontal (like a glass)
+            if (beta < -5 && beta > -180) {
+                pourRate += Math.max(0, (-5 - beta) / 40) * 0.008;
             }
 
             if (pourRate > 0 && V > 0) {
@@ -291,6 +292,12 @@ export default function App() {
     const refill = () => {
         volumeRef.current = 1.0;
         setUiVolume(1.0);
+    };
+
+    const handleShare = () => {
+        const text = "Olha essa incrível simulação de bebidas! 🍺 Acesse aqui: " + window.location.href;
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank');
     };
 
     return (
@@ -349,6 +356,14 @@ export default function App() {
                     )}
                 </>
             )}
+
+            <button
+                onClick={handleShare}
+                className="absolute top-6 right-6 z-50 p-3 bg-[#25D366] hover:bg-[#1ebd57] text-white rounded-full shadow-[0_0_15px_rgba(37,211,102,0.3)] transition-all active:scale-95 flex items-center justify-center"
+                title="Compartilhar no WhatsApp"
+            >
+                <Share2 size={24} />
+            </button>
         </div>
     );
 }
