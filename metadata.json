@@ -1,0 +1,5 @@
+{
+  "name": "Beer Simulator",
+  "description": "Tilt your phone to drink a virtual beer.",
+  "requestFramePermissions": ["accelerometer", "gyroscope"]
+}
