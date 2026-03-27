@@ -4,8 +4,15 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Beer, RefreshCcw, Share2 } from 'lucide-react';
+
+const WARNINGS = [
+    "Beba com moderação e se beber não dirija! 🚗🚫",
+    "Proibido venda para menores de 18 anos. 🔞",
+    "Bebidas viciam. Consuma com responsabilidade.",
+    "Se divirta 😃🍻"
+];
 
 class Bubble {
     x: number;
@@ -280,6 +287,7 @@ function getLiquidShape(W: number, H: number, V: number, theta: number) {
 export default function App() {
     const [hasPermission, setHasPermission] = useState(false);
     const [uiVolume, setUiVolume] = useState(1.0);
+    const [activeWarning, setActiveWarning] = useState<string | null>(null);
     
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const volumeRef = useRef(1.0);
@@ -289,6 +297,7 @@ export default function App() {
     const lastGulpVolumeRef = useRef(1.0);
     const foamThicknessRef = useRef(20);
     const lastOrientationRef = useRef({ beta: 90, gamma: 0 });
+    const warningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const requestAccess = async () => {
         soundEngine.init();
@@ -485,6 +494,11 @@ export default function App() {
                 if (lastGulpVolumeRef.current - volumeRef.current > 0.15) {
                     soundEngine.playGulp();
                     lastGulpVolumeRef.current = volumeRef.current;
+                    
+                    const randomWarning = WARNINGS[Math.floor(Math.random() * WARNINGS.length)];
+                    setActiveWarning(randomWarning);
+                    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
+                    warningTimeoutRef.current = setTimeout(() => setActiveWarning(null), 3500);
                 }
             } else {
                 soundEngine.stopDrinking();
@@ -576,6 +590,21 @@ export default function App() {
                             <p className="text-white/70 font-medium tracking-widest uppercase text-sm">Incline para beber</p>
                         </div>
                     )}
+
+                    <AnimatePresence>
+                        {activeWarning && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                className="absolute bottom-24 left-0 right-0 flex justify-center z-50 pointer-events-none px-6"
+                            >
+                                <div className="bg-black/70 backdrop-blur-md text-white/90 px-6 py-3 rounded-2xl text-sm font-medium border border-white/10 shadow-2xl text-center max-w-sm">
+                                    {activeWarning}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </>
             )}
 
