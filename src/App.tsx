@@ -14,20 +14,22 @@ class Bubble {
     speed: number;
     wobble: number;
     wobbleSpeed: number;
+    opacity: number;
 
     constructor(W: number, H: number) {
         this.x = Math.random() * W;
         this.y = Math.random() * H;
-        this.radius = Math.random() * 4 + 1;
-        this.speed = Math.random() * 3 + 1;
+        this.radius = Math.random() * 6 + 2;
+        this.speed = Math.random() * 5 + 2;
         this.wobble = Math.random() * Math.PI * 2;
-        this.wobbleSpeed = Math.random() * 0.1 + 0.05;
+        this.wobbleSpeed = Math.random() * 0.1 + 0.02;
+        this.opacity = Math.random() * 0.5 + 0.2;
     }
 
     update(W: number, H: number, surface: number[][], V: number) {
         this.y -= this.speed;
         this.wobble += this.wobbleSpeed;
-        this.x += Math.sin(this.wobble) * 1;
+        this.x += Math.sin(this.wobble) * 1.5;
 
         let surfaceY = 0;
         if (surface.length === 2) {
@@ -40,16 +42,23 @@ class Bubble {
             }
         }
 
-        if (this.y < surfaceY - 10 || V <= 0) {
-            this.y = H + Math.random() * 50;
+        if (this.y < surfaceY || V <= 0) {
+            this.y = H + Math.random() * 100;
             this.x = Math.random() * W;
+            this.radius = Math.random() * 6 + 2;
+            this.speed = Math.random() * 5 + 2;
         }
     }
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity + 0.3})`;
         ctx.fill();
     }
 }
@@ -91,6 +100,25 @@ class SoundEngine {
 
         osc.start();
         osc.stop(this.ctx.currentTime + 0.3);
+    }
+
+    playGulp() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.2);
+
+        gain.gain.setValueAtTime(0, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
     }
 
     playRefill() {
@@ -258,6 +286,9 @@ export default function App() {
     const orientationRef = useRef({ beta: 90, gamma: 0 });
     const hasReceivedOrientation = useRef(false);
     const bubblesRef = useRef<Bubble[]>([]);
+    const lastGulpVolumeRef = useRef(1.0);
+    const foamThicknessRef = useRef(20);
+    const lastOrientationRef = useRef({ beta: 90, gamma: 0 });
 
     const requestAccess = async () => {
         soundEngine.init();
@@ -378,20 +409,59 @@ export default function App() {
                 });
 
                 if (surface.length === 2) {
+                    // Shake detection for foam
+                    const deltaBeta = Math.abs(beta - lastOrientationRef.current.beta);
+                    const deltaGamma = Math.abs(gamma - lastOrientationRef.current.gamma);
+                    if (deltaBeta > 2 || deltaGamma > 2) {
+                        foamThicknessRef.current = Math.min(60, foamThicknessRef.current + (deltaBeta + deltaGamma) * 0.8);
+                    }
+                    
                     ctx.beginPath();
                     ctx.moveTo(surface[0][0], surface[0][1]);
                     ctx.lineTo(surface[1][0], surface[1][1]);
-                    ctx.strokeStyle = '#fffdf0';
-                    ctx.lineWidth = Math.min(40, V * 200 + 10);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.lineWidth = foamThicknessRef.current;
                     ctx.lineCap = 'round';
                     ctx.stroke();
+
+                    const foamBubblesCount = Math.floor(W / 15);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    for (let i = 0; i <= foamBubblesCount; i++) {
+                        const t = i / foamBubblesCount;
+                        const fx = surface[0][0] + t * (surface[1][0] - surface[0][0]);
+                        const fy = surface[0][1] + t * (surface[1][1] - surface[0][1]);
+                        
+                        const radius = (foamThicknessRef.current / 2) + Math.random() * 8;
+                        const offsetY = (Math.random() - 0.5) * (foamThicknessRef.current * 0.5);
+                        
+                        ctx.beginPath();
+                        ctx.arc(fx, fy + offsetY, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 }
             }
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-            ctx.fillRect(0, 0, W * 0.15, H);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-            ctx.fillRect(W * 0.85, 0, W * 0.1, H);
+            foamThicknessRef.current = Math.max(20, foamThicknessRef.current - 0.5);
+            lastOrientationRef.current = { beta, gamma };
+
+            // Glass Vector Overlay
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(0, 0, 24, H);
+            ctx.fillRect(W - 24, 0, 24, H);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fillRect(0, H - 40, W, 40);
+            
+            const gradientLeft = ctx.createLinearGradient(0, 0, 80, 0);
+            gradientLeft.addColorStop(0, 'rgba(255,255,255,0.3)');
+            gradientLeft.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = gradientLeft;
+            ctx.fillRect(24, 0, 56, H);
+
+            const gradientRight = ctx.createLinearGradient(W - 80, 0, W, 0);
+            gradientRight.addColorStop(0, 'rgba(255,255,255,0)');
+            gradientRight.addColorStop(1, 'rgba(255,255,255,0.15)');
+            ctx.fillStyle = gradientRight;
+            ctx.fillRect(W - 80, 0, 56, H);
 
             let isSpilling = false;
             if (surface.length === 2) {
@@ -411,6 +481,11 @@ export default function App() {
             if (pourRate > 0 && V > 0) {
                 volumeRef.current = Math.max(0, V - pourRate);
                 soundEngine.startDrinking();
+                
+                if (lastGulpVolumeRef.current - volumeRef.current > 0.15) {
+                    soundEngine.playGulp();
+                    lastGulpVolumeRef.current = volumeRef.current;
+                }
             } else {
                 soundEngine.stopDrinking();
             }
@@ -428,6 +503,7 @@ export default function App() {
 
     const refill = () => {
         volumeRef.current = 1.0;
+        lastGulpVolumeRef.current = 1.0;
         setUiVolume(1.0);
         soundEngine.playRefill();
     };
