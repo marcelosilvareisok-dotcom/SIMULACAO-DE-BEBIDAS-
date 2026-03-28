@@ -600,6 +600,24 @@ export default function App() {
         soundEngine.playRefill();
     };
 
+    const saveState = () => {
+        localStorage.setItem('beerSimulationState', JSON.stringify({ volume: volumeRef.current }));
+        alert('Progresso salvo!');
+    };
+
+    const loadState = () => {
+        const savedState = localStorage.getItem('beerSimulationState');
+        if (savedState) {
+            const { volume } = JSON.parse(savedState);
+            volumeRef.current = volume;
+            lastGulpVolumeRef.current = volume;
+            setUiVolume(volume);
+            alert('Progresso carregado!');
+        } else {
+            alert('Nenhum progresso salvo encontrado.');
+        }
+    };
+
     const handleShare = () => {
         soundEngine.playShare();
         const text = "Olha essa incrível simulação de bebidas! 🍺 Acesse aqui: " + window.location.href;
@@ -693,6 +711,11 @@ export default function App() {
             >
                 <RefreshCcw size={20} />
             </button>
+
+            <div className="absolute top-6 left-20 z-50 flex gap-2">
+                <button onClick={saveState} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all" title="Salvar Progresso">💾</button>
+                <button onClick={loadState} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all" title="Carregar Progresso">📂</button>
+            </div>
 
             <button
                 onClick={handleShare}
