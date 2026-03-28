@@ -287,8 +287,24 @@ function getLiquidShape(W: number, H: number, V: number, theta: number) {
 
 export default function App() {
     const [hasPermission, setHasPermission] = useState(false);
+    const [isStarted, setIsStarted] = useState(false);
     const [uiVolume, setUiVolume] = useState(1.0);
     const [activeWarning, setActiveWarning] = useState<string | null>(null);
+    
+    useEffect(() => {
+        const handleInteraction = () => {
+            if (!isStarted) {
+                soundEngine.init();
+                setIsStarted(true);
+            }
+        };
+        window.addEventListener('click', handleInteraction);
+        window.addEventListener('touchstart', handleInteraction);
+        return () => {
+            window.removeEventListener('click', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+        };
+    }, [isStarted]);
     
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const volumeRef = useRef(1.0);
@@ -505,6 +521,9 @@ export default function App() {
             if (surface.length === 2) {
                 if (surface[0][1] <= 0 || surface[1][1] <= 0) {
                     isSpilling = true;
+                    if (Math.random() < 0.1) { // Throttle the sound
+                        soundEngine.playRefill();
+                    }
                 }
             }
 
