@@ -408,7 +408,8 @@ export default function App() {
 
                 const minY = Math.min(...polygon.map(p => p[1]));
                 const gradient = ctx.createLinearGradient(0, minY, 0, H);
-                gradient.addColorStop(0, '#f39c12');
+                gradient.addColorStop(0, '#f1c40f');
+                gradient.addColorStop(0.5, '#f39c12');
                 gradient.addColorStop(1, '#d35400');
                 ctx.fillStyle = gradient;
                 ctx.fill();
@@ -423,30 +424,39 @@ export default function App() {
                     const deltaBeta = Math.abs(beta - lastOrientationRef.current.beta);
                     const deltaGamma = Math.abs(gamma - lastOrientationRef.current.gamma);
                     if (deltaBeta > 2 || deltaGamma > 2) {
-                        foamThicknessRef.current = Math.min(60, foamThicknessRef.current + (deltaBeta + deltaGamma) * 0.8);
+                        foamThicknessRef.current = Math.min(80, foamThicknessRef.current + (deltaBeta + deltaGamma) * 1.2);
                     }
                     
+                    // Thicker, more realistic foam
                     ctx.beginPath();
                     ctx.moveTo(surface[0][0], surface[0][1]);
                     ctx.lineTo(surface[1][0], surface[1][1]);
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
                     ctx.lineWidth = foamThicknessRef.current;
                     ctx.lineCap = 'round';
                     ctx.stroke();
 
-                    const foamBubblesCount = Math.floor(W / 15);
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    // Foam bubbles
+                    const foamBubblesCount = Math.floor(W / 10);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
                     for (let i = 0; i <= foamBubblesCount; i++) {
                         const t = i / foamBubblesCount;
                         const fx = surface[0][0] + t * (surface[1][0] - surface[0][0]);
                         const fy = surface[0][1] + t * (surface[1][1] - surface[0][1]);
                         
-                        const radius = (foamThicknessRef.current / 2) + Math.random() * 8;
-                        const offsetY = (Math.random() - 0.5) * (foamThicknessRef.current * 0.5);
+                        const radius = (foamThicknessRef.current / 3) + Math.random() * 10;
+                        const offsetY = (Math.random() - 0.5) * (foamThicknessRef.current * 0.8);
                         
                         ctx.beginPath();
                         ctx.arc(fx, fy + offsetY, radius, 0, Math.PI * 2);
                         ctx.fill();
+                        
+                        // Add a small highlight to bubbles
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                        ctx.beginPath();
+                        ctx.arc(fx + radius * 0.2, fy + offsetY - radius * 0.2, radius * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
                     }
                 }
             }
