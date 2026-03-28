@@ -600,28 +600,10 @@ export default function App() {
         soundEngine.playRefill();
     };
 
-    const saveState = () => {
-        localStorage.setItem('beerSimulationState', JSON.stringify({ volume: volumeRef.current }));
-        alert('Progresso salvo!');
-    };
-
-    const loadState = () => {
-        const savedState = localStorage.getItem('beerSimulationState');
-        if (savedState) {
-            const { volume } = JSON.parse(savedState);
-            volumeRef.current = volume;
-            lastGulpVolumeRef.current = volume;
-            setUiVolume(volume);
-            alert('Progresso carregado!');
-        } else {
-            alert('Nenhum progresso salvo encontrado.');
-        }
-    };
-
     const handleShare = () => {
         soundEngine.playShare();
         const text = "Olha essa incrível simulação de bebidas! 🍺 Acesse aqui: " + window.location.href;
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        const whatsappUrl = `https://wa.me/5594991233751?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, '_blank');
     };
 
@@ -712,34 +694,22 @@ export default function App() {
                 <RefreshCcw size={20} />
             </button>
 
-            <div className="absolute top-6 left-20 z-50 flex gap-2">
-                <button onClick={saveState} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all" title="Salvar Progresso">💾</button>
-                <button onClick={loadState} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all" title="Carregar Progresso">📂</button>
-            </div>
-
-            <button
-                onClick={handleShare}
-                className="absolute top-6 right-6 z-50 p-3 bg-[#25D366] hover:bg-[#1ebd57] text-white rounded-full shadow-[0_0_15px_rgba(37,211,102,0.3)] transition-all active:scale-95 flex items-center justify-center"
-                title="Compartilhar no WhatsApp"
-            >
-                <Share2 size={24} />
-            </button>
-
             <motion.a
                 href="https://wa.me/5594991233751"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute bottom-6 left-6 z-50 p-4 bg-[#25D366] text-white rounded-full shadow-[0_0_20px_rgba(37,211,102,0.6)] flex items-center justify-center"
                 animate={{ 
-                    scale: [1, 1.1, 1],
+                    scale: [1, 1.2, 1],
+                    rotate: [0, -15, 15, -15, 0],
                     boxShadow: [
                         "0 0 10px rgba(37, 211, 102, 0.4)",
-                        "0 0 25px rgba(37, 211, 102, 0.8)",
+                        "0 0 35px rgba(37, 211, 102, 0.9)",
                         "0 0 10px rgba(37, 211, 102, 0.4)"
                     ]
                 }}
                 transition={{ 
-                    duration: 2,
+                    duration: 1.5,
                     repeat: Infinity,
                     ease: "easeInOut"
                 }}
