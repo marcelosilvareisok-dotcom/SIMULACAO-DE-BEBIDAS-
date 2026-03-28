@@ -643,43 +643,47 @@ export default function App() {
     return (
         <div className="relative w-full h-screen overflow-hidden bg-black select-none touch-none">
             {!beverage ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#f8e71c] p-6 text-center">
-                    <div className="mb-8">
-                        <h1 className="text-4xl font-black text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.3)] tracking-wider">
-                            BEER SIMULATOR
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-6 text-center">
+                    <div className="mb-16">
+                        <h1 className="text-5xl font-serif font-light text-white tracking-widest uppercase">
+                            Cerveja Virtual
                         </h1>
+                        <div className="h-px w-24 bg-white/30 mx-auto mt-6"></div>
                     </div>
 
-                    <button
-                        onClick={() => startSimulation('beer')}
-                        className="w-40 h-40 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_10px_0_rgba(180,83,9,1)] flex items-center justify-center mb-10 active:translate-y-2 active:shadow-none transition-all"
-                    >
-                        <div className="w-0 h-0 border-t-[30px] border-t-transparent border-l-[50px] border-l-white border-b-[30px] border-b-transparent ml-2"></div>
-                    </button>
+                    <div className="flex flex-col gap-4 w-full max-w-xs">
+                        <button
+                            onClick={() => startSimulation('beer')}
+                            className="w-full py-4 border border-white/20 hover:bg-white/10 rounded-full text-white font-light text-lg tracking-widest uppercase transition-all"
+                        >
+                            Cerveja
+                        </button>
+                        <button
+                            onClick={() => startSimulation('wine')}
+                            className="w-full py-4 border border-white/20 hover:bg-white/10 rounded-full text-white font-light text-lg tracking-widest uppercase transition-all"
+                        >
+                            Vinho
+                        </button>
+                        <button
+                            onClick={() => startSimulation('juice')}
+                            className="w-full py-4 border border-white/20 hover:bg-white/10 rounded-full text-white font-light text-lg tracking-widest uppercase transition-all"
+                        >
+                            Suco
+                        </button>
+                    </div>
 
-                    <button
-                        onClick={() => {
-                            const next = beverages[(beverages.findIndex(b => b.id === 'beer') + 1) % beverages.length];
-                            // Simplified for now, just toggling
-                            startSimulation('wine');
-                        }}
-                        className="w-full max-w-xs py-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_6px_0_rgba(180,83,9,1)] text-white font-black text-xl drop-shadow-md mb-6 active:translate-y-1 active:shadow-none transition-all"
-                    >
-                        SABOR DE CERVEJA
-                    </button>
-
-                    <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
+                    <div className="mt-16 flex gap-8">
                         <button 
                             onClick={handleShare}
-                            className="py-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_6px_0_rgba(180,83,9,1)] text-white font-black text-lg active:translate-y-1 active:shadow-none transition-all"
+                            className="text-white/60 hover:text-white text-xs tracking-widest uppercase transition-colors"
                         >
-                            MAIS APPS
+                            Apps
                         </button>
                         <button 
                             onClick={() => alert('Chave Pix: 94991233751')}
-                            className="py-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_6px_0_rgba(180,83,9,1)] text-white font-black text-lg active:translate-y-1 active:shadow-none transition-all"
+                            className="text-white/60 hover:text-white text-xs tracking-widest uppercase transition-colors"
                         >
-                            INFO
+                            Apoiar
                         </button>
                     </div>
                 </div>

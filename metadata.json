@@ -1,5 +1,5 @@
 {
-  "name": "Beer Simulator",
-  "description": "Tilt your phone to drink a virtual beer.",
+  "name": "Cerveja Virtual",
+  "description": "Uma experiência imersiva de simulação de cerveja.",
   "requestFramePermissions": ["accelerometer", "gyroscope"]
 }
