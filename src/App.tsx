@@ -455,23 +455,41 @@ export default function App() {
             lastOrientationRef.current = { beta, gamma };
 
             // Glass Vector Overlay
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
             ctx.fillRect(0, 0, 24, H);
             ctx.fillRect(W - 24, 0, 24, H);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.fillRect(0, H - 40, W, 40);
             
-            const gradientLeft = ctx.createLinearGradient(0, 0, 80, 0);
-            gradientLeft.addColorStop(0, 'rgba(255,255,255,0.3)');
+            // Condensation Droplets
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            for(let i = 0; i < 40; i++) {
+                const dx = Math.random() * W;
+                const dy = Math.random() * H;
+                ctx.beginPath();
+                ctx.arc(dx, dy, Math.random() * 2 + 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            const gradientLeft = ctx.createLinearGradient(0, 0, 120, 0);
+            gradientLeft.addColorStop(0, 'rgba(255,255,255,0.4)');
             gradientLeft.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.fillStyle = gradientLeft;
-            ctx.fillRect(24, 0, 56, H);
+            ctx.fillRect(24, 0, 80, H);
 
-            const gradientRight = ctx.createLinearGradient(W - 80, 0, W, 0);
+            const gradientRight = ctx.createLinearGradient(W - 120, 0, W, 0);
             gradientRight.addColorStop(0, 'rgba(255,255,255,0)');
-            gradientRight.addColorStop(1, 'rgba(255,255,255,0.15)');
+            gradientRight.addColorStop(1, 'rgba(255,255,255,0.2)');
             ctx.fillStyle = gradientRight;
-            ctx.fillRect(W - 80, 0, 56, H);
+            ctx.fillRect(W - 120, 0, 80, H);
+
+            // Light Shimmer
+            const shimmer = ctx.createLinearGradient(0, 0, W, H);
+            shimmer.addColorStop(0, 'rgba(255,255,255,0)');
+            shimmer.addColorStop(0.5, 'rgba(255,255,255,0.1)');
+            shimmer.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = shimmer;
+            ctx.fillRect(0, 0, W, H);
 
             let isSpilling = false;
             if (surface.length === 2) {
@@ -608,6 +626,14 @@ export default function App() {
                     </AnimatePresence>
                 </>
             )}
+
+            <button
+                onClick={() => window.location.reload()}
+                className="absolute top-6 left-6 z-50 p-2 bg-white/5 hover:bg-white/10 text-white/30 hover:text-white/70 rounded-full transition-all active:scale-95"
+                title="Atualizar página"
+            >
+                <RefreshCcw size={20} />
+            </button>
 
             <button
                 onClick={handleShare}
