@@ -643,18 +643,44 @@ export default function App() {
     return (
         <div className="relative w-full h-screen overflow-hidden bg-black select-none touch-none">
             {!beverage ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 text-white z-50 p-6">
-                    <h1 className="text-4xl font-black mb-10 text-center">Escolha sua bebida</h1>
-                    <div className="grid grid-cols-1 gap-4 w-full max-w-sm">
-                        {beverages.map((bev) => (
-                            <button
-                                key={bev.id}
-                                onClick={() => startSimulation(bev.id)}
-                                className="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-xl font-bold transition-all"
-                            >
-                                {bev.name}
-                            </button>
-                        ))}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#f8e71c] p-6 text-center">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-black text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.3)] tracking-wider">
+                            BEER SIMULATOR
+                        </h1>
+                    </div>
+
+                    <button
+                        onClick={() => startSimulation('beer')}
+                        className="w-40 h-40 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_10px_0_rgba(180,83,9,1)] flex items-center justify-center mb-10 active:translate-y-2 active:shadow-none transition-all"
+                    >
+                        <div className="w-0 h-0 border-t-[30px] border-t-transparent border-l-[50px] border-l-white border-b-[30px] border-b-transparent ml-2"></div>
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            const next = beverages[(beverages.findIndex(b => b.id === 'beer') + 1) % beverages.length];
+                            // Simplified for now, just toggling
+                            startSimulation('wine');
+                        }}
+                        className="w-full max-w-xs py-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_6px_0_rgba(180,83,9,1)] text-white font-black text-xl drop-shadow-md mb-6 active:translate-y-1 active:shadow-none transition-all"
+                    >
+                        SABOR DE CERVEJA
+                    </button>
+
+                    <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
+                        <button 
+                            onClick={handleShare}
+                            className="py-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_6px_0_rgba(180,83,9,1)] text-white font-black text-lg active:translate-y-1 active:shadow-none transition-all"
+                        >
+                            MAIS APPS
+                        </button>
+                        <button 
+                            onClick={() => alert('Chave Pix: 94991233751')}
+                            className="py-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full border-4 border-white shadow-[0_6px_0_rgba(180,83,9,1)] text-white font-black text-lg active:translate-y-1 active:shadow-none transition-all"
+                        >
+                            INFO
+                        </button>
                     </div>
                 </div>
             ) : !hasPermission ? (
@@ -742,7 +768,7 @@ export default function App() {
                 <RefreshCcw size={20} />
             </button>
 
-            <div className="absolute bottom-6 left-6 z-50">
+            <div className="absolute bottom-6 left-6 z-[60]">
                 <AnimatePresence>
                     {isMenuOpen && (
                         <motion.div
