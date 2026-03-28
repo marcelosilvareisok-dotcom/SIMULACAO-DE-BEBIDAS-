@@ -74,6 +74,7 @@ class SoundEngine {
     ctx: AudioContext | null = null;
     isDrinking = false;
     noiseSource: AudioBufferSourceNode | null = null;
+    ambientNoiseSource: AudioBufferSourceNode | null = null;
     filter: BiquadFilterNode | null = null;
     lfo: OscillatorNode | null = null;
     drinkGain: GainNode | null = null;
@@ -83,11 +84,40 @@ class SoundEngine {
             const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
             if (AudioCtx) {
                 this.ctx = new AudioCtx();
+                this.playAmbientNoise(); // Start ambient noise on init
             }
         }
         if (this.ctx && this.ctx.state === 'suspended') {
             this.ctx.resume();
         }
+    }
+
+    playAmbientNoise() {
+        if (!this.ctx || this.ambientNoiseSource) return;
+        
+        const bufferSize = this.ctx.sampleRate * 2;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        
+        this.ambientNoiseSource = this.ctx.createBufferSource();
+        this.ambientNoiseSource.buffer = buffer;
+        this.ambientNoiseSource.loop = true;
+        
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 400; // Muffled
+        
+        const gain = this.ctx.createGain();
+        gain.gain.value = 0.05; // Very subtle
+        
+        this.ambientNoiseSource.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        this.ambientNoiseSource.start();
     }
 
     playShare() {
