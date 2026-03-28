@@ -116,21 +116,21 @@ class SoundEngine {
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.2);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
 
         gain.gain.setValueAtTime(0, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+        gain.gain.linearRampToValueAtTime(0.6, this.ctx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
 
         osc.start();
-        osc.stop(this.ctx.currentTime + 0.2);
+        osc.stop(this.ctx.currentTime + 0.15);
     }
 
     playRefill() {
         if (!this.ctx) return;
-        const bufferSize = this.ctx.sampleRate * 2.0;
+        const bufferSize = this.ctx.sampleRate * 0.5;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
@@ -141,13 +141,14 @@ class SoundEngine {
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(200, this.ctx.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(2000, this.ctx.currentTime + 1.5);
+        filter.frequency.setValueAtTime(1000, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(4000, this.ctx.currentTime + 0.5);
+        filter.Q.value = 5;
 
         const gain = this.ctx.createGain();
         gain.gain.setValueAtTime(0, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.4, this.ctx.currentTime + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.8);
+        gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
 
         noise.connect(filter);
         filter.connect(gain);
