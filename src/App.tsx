@@ -318,9 +318,20 @@ function getLiquidShape(W: number, H: number, V: number, theta: number) {
 export default function App() {
     const [hasPermission, setHasPermission] = useState(false);
     const [isStarted, setIsStarted] = useState(false);
+    const [beverage, setBeverage] = useState<'beer' | 'wine' | 'juice' | null>(null);
     const [uiVolume, setUiVolume] = useState(1.0);
     const [activeWarning, setActiveWarning] = useState<string | null>(null);
-    
+
+    const beverages = [
+        { id: 'beer', name: 'Cerveja', color: '#F59E0B' },
+        { id: 'wine', name: 'Vinho', color: '#7F1D1D' },
+        { id: 'juice', name: 'Suco', color: '#FCD34D' },
+    ] as const;
+    const startSimulation = (bev: 'beer' | 'wine' | 'juice') => {
+        setBeverage(bev);
+        requestAccess();
+    };
+
     useEffect(() => {
         const handleInteraction = () => {
             if (!isStarted) {
@@ -433,6 +444,8 @@ export default function App() {
             const H = canvas.height;
             let V = volumeRef.current;
             const { beta, gamma } = orientationRef.current;
+            const selectedBeverage = beverages.find(b => b.id === beverage);
+            const baseColor = selectedBeverage?.color || '#F59E0B';
 
             ctx.clearRect(0, 0, W, H);
 
@@ -454,9 +467,8 @@ export default function App() {
 
                 const minY = Math.min(...polygon.map(p => p[1]));
                 const gradient = ctx.createLinearGradient(0, minY, 0, H);
-                gradient.addColorStop(0, '#f1c40f');
-                gradient.addColorStop(0.5, '#f39c12');
-                gradient.addColorStop(1, '#d35400');
+                gradient.addColorStop(0, baseColor);
+                gradient.addColorStop(1, '#000000');
                 ctx.fillStyle = gradient;
                 ctx.fill();
 
@@ -630,7 +642,22 @@ export default function App() {
 
     return (
         <div className="relative w-full h-screen overflow-hidden bg-black select-none touch-none">
-            {!hasPermission ? (
+            {!beverage ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 text-white z-50 p-6">
+                    <h1 className="text-4xl font-black mb-10 text-center">Escolha sua bebida</h1>
+                    <div className="grid grid-cols-1 gap-4 w-full max-w-sm">
+                        {beverages.map((bev) => (
+                            <button
+                                key={bev.id}
+                                onClick={() => startSimulation(bev.id)}
+                                className="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-xl font-bold transition-all"
+                            >
+                                {bev.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            ) : !hasPermission ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 text-white z-50 p-6">
                     <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}
@@ -726,6 +753,7 @@ export default function App() {
                         >
                             <button onClick={shareApp} className="p-3 text-white hover:bg-zinc-700 rounded-xl text-left transition-colors">Compartilhar App</button>
                             <button onClick={handleShare} className="p-3 text-white hover:bg-zinc-700 rounded-xl text-left transition-colors">Falar com o Dev</button>
+                            <button onClick={() => alert('Chave Pix: 94991233751')} className="p-3 text-white hover:bg-zinc-700 rounded-xl text-left transition-colors">Apoie o Dev (Pix)</button>
                         </motion.div>
                     )}
                 </AnimatePresence>
